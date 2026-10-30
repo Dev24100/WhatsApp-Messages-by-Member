@@ -734,6 +734,41 @@
       line-height: 1.55;
     }
 
+    .privacy-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .privacy-disclaimer {
+      margin-top: 32px;
+      padding: 22px 26px;
+      background: var(--wa-mint);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-md);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .privacy-disclaimer-icon {
+      font-size: 1.4rem;
+      color: var(--wa-teal-dark);
+      flex-shrink: 0;
+      line-height: 1.2;
+    }
+
+    .privacy-disclaimer-text strong {
+      display: block;
+      color: var(--wa-teal-dark);
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .privacy-disclaimer-text p {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
     /* ==========================================================================
        Section: Project Documentation
        ========================================================================== */
@@ -1076,8 +1111,8 @@
             <span>All Messages &amp; Files</span>
           </div>
           <div class="stat-item">
-            <strong>100% Client-Side</strong>
-            <span>E2EE Intact</span>
+            <strong>Privacy-First</strong>
+            <span>Proposed On-Device</span>
           </div>
           <div class="stat-item">
             <strong>Zero Friction</strong>
@@ -1320,10 +1355,10 @@
   <section class="section-padding privacy-section" id="privacy">
     <div class="container">
       <div class="section-header">
-        <span class="badge">Security &amp; Architecture</span>
-        <h2 class="section-title">Built with Privacy at the Core</h2>
+        <span class="badge">Privacy &amp; Security</span>
+        <h2 class="section-title">Privacy-Preserving Design Principles (Proposed)</h2>
         <p class="section-subtitle">
-          Designed to strictly preserve WhatsApp's end-to-end encryption standards and user privacy expectations.
+          These proposed design requirements outline how sender-based filtering should protect user privacy and respect WhatsApp's existing security architecture if implemented.
         </p>
       </div>
 
@@ -1331,29 +1366,9 @@
         <div class="privacy-card">
           <div class="privacy-icon">🔒</div>
           <div class="privacy-text">
-            <h4>End-to-End Encryption Untouched</h4>
+            <h4>1. Preserve End-to-End Encryption</h4>
             <p>
-              Filtering executes entirely on the local client device using already decrypted local SQLite records. Server infrastructure never receives search queries or sender filter criteria.
-            </p>
-          </div>
-        </div>
-
-        <div class="privacy-card">
-          <div class="privacy-icon">🛡️</div>
-          <div class="privacy-text">
-            <h4>Strict Group Permission Boundaries</h4>
-            <p>
-              Users can only filter messages within groups of which they are active members. Messages cannot leak across different groups or expose direct private chats.
-            </p>
-          </div>
-        </div>
-
-        <div class="privacy-card">
-          <div class="privacy-icon">⏱️</div>
-          <div class="privacy-text">
-            <h4>Ephemeral &amp; Deleted Message Compliance</h4>
-            <p>
-              Respects "Delete for Everyone" and disappearing message timers immediately. Deleted or expired content is never retained in filtered lists.
+              The proposed feature should not weaken or bypass WhatsApp's existing end-to-end encryption protections. Message contents must remain protected in transit and accessible only to authorized participants.
             </p>
           </div>
         </div>
@@ -1361,11 +1376,51 @@
         <div class="privacy-card">
           <div class="privacy-icon">📱</div>
           <div class="privacy-text">
-            <h4>Synthetic Sample Data</h4>
+            <h4>2. Prefer On-Device Filtering</h4>
             <p>
-              The accompanying prototype runs 100% in your local browser sandbox using fictional sample people and messages. It does not connect to real WhatsApp servers or access live accounts.
+              Where technically feasible, filtering should happen locally on messages already accessible to the user on their device, rather than querying external indexing infrastructure.
             </p>
           </div>
+        </div>
+
+        <div class="privacy-card">
+          <div class="privacy-icon">🛡️</div>
+          <div class="privacy-text">
+            <h4>3. Minimize Data Exposure</h4>
+            <p>
+              Search queries and sender-filter criteria should not be unnecessarily exposed to external services or servers. Group interaction data should remain private to the user.
+            </p>
+          </div>
+        </div>
+
+        <div class="privacy-card">
+          <div class="privacy-icon">⏱️</div>
+          <div class="privacy-text">
+            <h4>4. Respect Existing Message Rules</h4>
+            <p>
+              Deleted messages ("Delete for Everyone"), disappearing messages, group membership boundaries, and access permissions should strictly follow WhatsApp's existing behavior.
+            </p>
+          </div>
+        </div>
+
+        <div class="privacy-card full-width">
+          <div class="privacy-icon">👤</div>
+          <div class="privacy-text">
+            <h4>5. User Privacy and Control</h4>
+            <p>
+              Users should only be able to filter messages they are already authorized to access within active groups. The proposed feature must never expose private 1-on-1 chats, cross-group content, or bypass group membership restrictions.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="privacy-disclaimer">
+        <div class="privacy-disclaimer-icon">ℹ️</div>
+        <div class="privacy-disclaimer-text">
+          <strong>Concept Proposal &amp; Prototype Disclaimer</strong>
+          <p>
+            This project is an independent concept proposal and interactive prototype. It is not an official WhatsApp feature and is not affiliated with, endorsed by, or connected to Meta or WhatsApp. The prototype uses fictional sample data and does not connect to WhatsApp or access real messages. These privacy and architectural points represent proposed design requirements, not verified implementation details or guarantees.
+          </p>
         </div>
       </div>
     </div>
@@ -1412,8 +1467,8 @@
         <!-- Doc 4 -->
         <a href="docs/privacy-considerations.md" class="doc-card">
           <span class="doc-badge md">Markdown</span>
-          <h4>Privacy Analysis</h4>
-          <p>Deep-dive into client-side query indexing, Signal Protocol compatibility, and permission boundaries.</p>
+          <h4>Privacy Considerations</h4>
+          <p>Proposed privacy principles, on-device data boundaries, and encryption considerations.</p>
           <span class="doc-link">Read Privacy Doc ↗</span>
         </a>
       </div>
@@ -1461,7 +1516,7 @@
       </div>
 
       <div class="footer-disclaimer">
-        <strong>Disclaimer:</strong> This is an independent feature suggestion and prototype. It is not affiliated with, endorsed by, or officially connected to WhatsApp LLC or Meta Platforms, Inc. WhatsApp and the WhatsApp logo are registered trademarks of Meta Platforms, Inc.
+        <strong>Disclaimer:</strong> This is an independent feature proposal and interactive prototype. It is not affiliated with, endorsed by, or connected to WhatsApp LLC or Meta Platforms, Inc. WhatsApp and the WhatsApp logo are registered trademarks of Meta Platforms, Inc. The prototype uses fictional sample data and does not connect to WhatsApp or access real messages.
       </div>
 
       <div class="footer-bottom">
