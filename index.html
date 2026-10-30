@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WhatsApp Messages by Member — Feature Proposal & Interactive Prototype</title>
+  <meta name="description" content="An independent WhatsApp feature proposal that makes large group conversations easier to navigate by filtering messages and media shared by a specific participant.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+  
+  <style>
+    /* ==========================================================================
+       Design System & Variables
+       ========================================================================== */
+    :root {
+      --wa-teal-dark: #075e54;
+      --wa-teal: #128c7e;
+      --wa-green: #25d366;
+      --wa-green-light: #dcf8c6;
+      --wa-mint: #e7f5f1;
+      --wa-mint-dark: #0e6b5e;
+      --bg-page: #f8faf9;
+      --bg-surface: #ffffff;
+      --text-main: #111b21;
+      --text-muted: #54656f;
+      --text-subtle: #8696a0;
+      --border-light: #e9edef;
+      --border-accent: #c4ded6;
+      --shadow-sm: 0 2px 8px rgba(11, 20, 26, 0.04);
+      --shadow-md: 0 8px 24px rgba(7, 94, 84, 0.08);
+      --shadow-lg: 0 16px 40px rgba(17, 27, 33, 0.10);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-pill: 9999px;
+      --container-max: 1160px;
+      --transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ==========================================================================
+       Layout Utilities
+       ========================================================================== */
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section-padding {
+      padding: 96px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 56px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--wa-mint);
+      color: var(--wa-teal-dark);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      border: 1px solid var(--border-accent);
+    }
+
+    .section-title {
+      font-size: 2.35rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-main);
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 26px;
+      border-radius: var(--radius-pill);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--wa-teal);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(18, 140, 126, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: var(--wa-teal-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(7, 94, 84, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--wa-teal-dark);
+      border-color: var(--border-light);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      background: var(--wa-mint);
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+
+    .btn-sm {
+      padding: 9px 18px;
+      font-size: 0.85rem;
+    }
+
+    /* ==========================================================================
+       Header & Navigation
+       ========================================================================== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-light);
+      transition: var(--transition);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      color: var(--wa-teal-dark);
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--wa-teal-dark);
+      color: #ffffff;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 1.15rem;
+      box-shadow: 0 4px 10px rgba(7, 94, 84, 0.25);
+    }
+
+    .brand-text small {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--wa-teal);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--wa-teal-dark);
+      cursor: pointer;
+      padding: 6px;
+    }
+
+    /* ==========================================================================
+       Hero Section
+       ========================================================================== */
+    .hero {
+      padding: 80px 0 88px;
+      background: radial-gradient(circle at 80% 20%, rgba(220, 248, 198, 0.35), transparent 50%),
+                  radial-gradient(circle at 10% 80%, rgba(231, 245, 241, 0.6), transparent 50%);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .hero-content h1 {
+      font-size: 3.35rem;
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -0.04em;
+      color: var(--wa-teal-dark);
+      margin-bottom: 20px;
+    }
+
+    .hero-lead {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .stat-item strong {
+      display: block;
+      font-size: 1.35rem;
+      color: var(--wa-teal-dark);
+      font-weight: 800;
+    }
+
+    .stat-item span {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .hero-preview {
+      position: relative;
+    }
+
+    .preview-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: var(--shadow-lg);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 50px rgba(7, 94, 84, 0.16);
+    }
+
+    .preview-img-wrap {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      position: relative;
+      background: #f1f5f3;
+    }
+
+    .preview-img-wrap img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 0.4s ease;
+    }
+
+    .preview-card:hover .preview-img-wrap img {
+      transform: scale(1.02);
+    }
+
+    .preview-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(7, 94, 84, 0.92) 0%, rgba(7, 94, 84, 0.2) 60%, transparent 100%);
+      display: flex;
+      align-items: flex-end;
+      padding: 24px;
+      color: #ffffff;
+    }
+
+    .preview-overlay-text strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .preview-overlay-text span {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .preview-badge {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: var(--wa-green);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+    }
+
+    /* ==========================================================================
+       Section: Problem Statement
+       ========================================================================== */
+    .problem-section {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .problem-content h2 {
+      font-size: 2.15rem;
+      color: var(--text-main);
+      font-weight: 800;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .problem-content p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 18px;
+      line-height: 1.65;
+    }
+
+    .comparison-cards {
+      display: grid;
+      gap: 18px;
+    }
+
+    .comparison-card {
+      padding: 22px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      background: #fafbfc;
+      transition: var(--transition);
+    }
+
+    .comparison-card.pain {
+      border-left: 5px solid #e53935;
+    }
+
+    .comparison-card.solution {
+      border-left: 5px solid var(--wa-teal);
+      background: var(--wa-mint);
+      border-color: var(--border-accent);
+    }
+
+    .comparison-card h4 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .comparison-card.pain h4 {
+      color: #c62828;
+    }
+
+    .comparison-card.solution h4 {
+      color: var(--wa-teal-dark);
+    }
+
+    .comparison-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       Section: Proposed Features
+       ========================================================================== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-accent);
+    }
+
+    .feature-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--wa-mint);
+      color: var(--wa-teal);
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+    }
+
+    .status-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.02em;
+    }
+
+    .status-active {
+      background: #e6f7ec;
+      color: #1b873f;
+      border: 1px solid #b7e4c7;
+    }
+
+    .status-concept {
+      background: #f0f4f8;
+      color: #486581;
+      border: 1px solid #d9e2ec;
+    }
+
+    .feature-card h3 {
+      font-size: 1.25rem;
+      color: var(--text-main);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .feature-card p {
+      font-size: 0.94rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 16px;
+      flex-grow: 1;
+    }
+
+    .feature-meta {
+      font-size: 0.8rem;
+      color: var(--text-subtle);
+      border-top: 1px solid var(--border-light);
+      padding-top: 12px;
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+       Section: How It Works
+       ========================================================================== */
+    .steps-section {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .steps-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      position: relative;
+    }
+
+    .step-card {
+      background: #fafbfc;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 24px 18px;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .step-card:hover {
+      background: #ffffff;
+      border-color: var(--wa-teal);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-num {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--wa-teal-dark);
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 4px 10px rgba(7, 94, 84, 0.3);
+    }
+
+    .step-card h4 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .step-card p {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* ==========================================================================
+       Section: Prototype Preview & Wireframe Showcase
+       ========================================================================== */
+    .preview-section {
+      background: #f1f5f3;
+    }
+
+    .showcase-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+
+    .showcase-header {
+      max-width: 680px;
+      margin: 0 auto 28px;
+    }
+
+    .showcase-header h3 {
+      font-size: 1.85rem;
+      color: var(--wa-teal-dark);
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .showcase-header p {
+      color: var(--text-muted);
+      font-size: 1.02rem;
+    }
+
+    .showcase-media {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 32px;
+      background: #e2eae7;
+      cursor: zoom-in;
+    }
+
+    .showcase-media img {
+      width: 100%;
+      max-height: 580px;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 0.3s ease;
+    }
+
+    .showcase-media:hover img {
+      transform: scale(1.01);
+    }
+
+    .zoom-hint {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(17, 27, 33, 0.8);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.78rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+
+    .showcase-cta {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       Section: Privacy & Security
+       ========================================================================== */
+    .privacy-section {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .privacy-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+    }
+
+    .privacy-card {
+      background: #fafbfc;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      display: flex;
+      gap: 20px;
+      transition: var(--transition);
+    }
+
+    .privacy-card:hover {
+      background: #ffffff;
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .privacy-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--wa-mint);
+      color: var(--wa-teal-dark);
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .privacy-text h4 {
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .privacy-text p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ==========================================================================
+       Section: Project Documentation
+       ========================================================================== */
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+    }
+
+    .doc-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .doc-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--wa-teal);
+    }
+
+    .doc-badge {
+      align-self: flex-start;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .doc-badge.pdf {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .doc-badge.md {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .doc-card h4 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .doc-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .doc-link {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--wa-teal);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: var(--transition);
+    }
+
+    .doc-card:hover .doc-link {
+      color: var(--wa-teal-dark);
+      transform: translateX(3px);
+    }
+
+    /* ==========================================================================
+       Footer
+       ========================================================================== */
+    .site-footer {
+      background: #111b21;
+      color: #8696a0;
+      padding: 64px 0 32px;
+      font-size: 0.9rem;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid #202c33;
+    }
+
+    .footer-brand .brand {
+      color: #ffffff;
+      margin-bottom: 14px;
+    }
+
+    .footer-brand .brand-icon {
+      background: var(--wa-teal);
+    }
+
+    .footer-brand p {
+      max-width: 440px;
+      line-height: 1.6;
+      color: #8696a0;
+    }
+
+    .footer-col h5 {
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .footer-col a {
+      color: #8696a0;
+      transition: var(--transition);
+    }
+
+    .footer-col a:hover {
+      color: var(--wa-green);
+    }
+
+    .footer-disclaimer {
+      margin-top: 36px;
+      padding: 18px 24px;
+      background: #182229;
+      border: 1px solid #222e35;
+      border-radius: var(--radius-sm);
+      font-size: 0.84rem;
+      line-height: 1.55;
+      color: #aebac1;
+    }
+
+    .footer-disclaimer strong {
+      color: #ffffff;
+    }
+
+    .footer-bottom {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #667781;
+    }
+
+    /* ==========================================================================
+       Modal Lightbox for Visual Reference
+       ========================================================================== */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 20, 26, 0.92);
+      z-index: 1000;
+      padding: 24px;
+      overflow-y: auto;
+      place-items: center;
+      backdrop-filter: blur(6px);
+    }
+
+    .lightbox-modal.active {
+      display: grid;
+    }
+
+    .lightbox-content {
+      max-width: 1200px;
+      width: 100%;
+      position: relative;
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 38px;
+      height: 38px;
+      background: rgba(17, 27, 33, 0.85);
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .lightbox-close:hover {
+      background: var(--wa-teal);
+    }
+
+    /* ==========================================================================
+       Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .hero-content {
+        text-align: center;
+      }
+      .hero-buttons {
+        justify-content: center;
+      }
+      .hero-stats {
+        justify-content: center;
+      }
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .steps-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .docs-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .problem-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .section-padding {
+        padding: 64px 0;
+      }
+      .section-title {
+        font-size: 1.95rem;
+      }
+      .hero-content h1 {
+        font-size: 2.35rem;
+      }
+      .hero-lead {
+        font-size: 1.05rem;
+      }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 72px;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        flex-direction: column;
+        padding: 24px;
+        border-bottom: 1px solid var(--border-light);
+        box-shadow: var(--shadow-md);
+        gap: 16px;
+      }
+      .nav-links.active {
+        display: flex;
+      }
+      .menu-toggle {
+        display: block;
+      }
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      .steps-container {
+        grid-template-columns: 1fr;
+      }
+      .privacy-grid {
+        grid-template-columns: 1fr;
+      }
+      .docs-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-top {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       1. Navigation Bar
+       ========================================================================== -->
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="#" class="brand" aria-label="Messages by Member Homepage">
+        <div class="brand-icon">✆</div>
+        <div class="brand-text">
+          Messages by Member
+          <small>Independent Proposal</small>
+        </div>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#problem">The Problem</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#docs">Documentation</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="prototype/" class="btn btn-primary btn-sm">Try Demo ↗</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       2. Hero Section
+       ========================================================================== -->
+  <section class="hero" id="overview">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <span class="badge">Independent WhatsApp Feature Proposal · 2026</span>
+        <h1>Find the Message. Find the Sender.</h1>
+        <p class="hero-lead">
+          An independent WhatsApp feature proposal that makes large group conversations easier to navigate by filtering messages and media shared by a specific participant.
+        </p>
+        <div class="hero-buttons">
+          <a href="prototype/" class="btn btn-primary">Try Interactive Demo ↗</a>
+          <a href="https://github.com/Dev24100/WhatsApp-Messages-by-Member" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            View GitHub Repository
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <strong>2 Modes</strong>
+            <span>All Messages &amp; Files</span>
+          </div>
+          <div class="stat-item">
+            <strong>100% Client-Side</strong>
+            <span>E2EE Intact</span>
+          </div>
+          <div class="stat-item">
+            <strong>Zero Friction</strong>
+            <span>Direct in Group Info</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-preview">
+        <div class="preview-card" onclick="openLightbox()" style="cursor: pointer;" title="Click to view full wireframe reference">
+          <div class="preview-img-wrap">
+            <img src="design/visual-reference.png" alt="WhatsApp Messages by Member - Visual Reference Board Preview" loading="lazy">
+          </div>
+          <div class="preview-overlay">
+            <div class="preview-overlay-text">
+              <strong>9-Panel Comprehensive UX Flow</strong>
+              <span>Click to view full architectural wireframe board</span>
+            </div>
+          </div>
+          <span class="preview-badge">UX WIREFRAME</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       3. Problem Statement Section
+       ========================================================================== -->
+  <section class="section-padding problem-section" id="problem">
+    <div class="container problem-grid">
+      <div class="problem-content">
+        <span class="badge">The Motivation</span>
+        <h2>Information Overload in Large WhatsApp Groups</h2>
+        <p>
+          In college courses, school classes, professional workspaces, and community associations, dozens of participants actively share messages daily.
+        </p>
+        <p>
+          Consider a university semester group: several teachers send syllabus notes, assignment instructions, revision PDFs, and schedule updates. When a student needs only the DBMS notes shared by Prof. Sharma two weeks ago, finding them among hundreds of casual queries and other announcements is time-consuming and frustrating.
+        </p>
+        <p>
+          Keyword search requires remembering exact phrasing, while the shared media gallery lumps every file from all 120+ members together in one unsorted feed.
+        </p>
+      </div>
+
+      <div class="comparison-cards">
+        <div class="comparison-card pain">
+          <h4>❌ Today's Frustration</h4>
+          <p>
+            Endless scrolling through unrelated chat banter, fragmented keyword queries, and asking classmates or colleagues to re-share lost files.
+          </p>
+        </div>
+
+        <div class="comparison-card solution">
+          <h4>✓ With "Messages by Member"</h4>
+          <p>
+            Tap into Group Info, select the teacher or colleague, and immediately isolate all their shared messages or exclusively their PDF and media attachments in chronological order.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       4. Proposed Features Section
+       ========================================================================== -->
+  <section class="section-padding" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge">Feature Breakdown</span>
+        <h2 class="section-title">Designed for Everyday WhatsApp Workflows</h2>
+        <p class="section-subtitle">
+          Engineered to fit seamlessly into WhatsApp's familiar design language without adding visual clutter.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon">🔍</div>
+            <span class="status-pill status-active">Interactive in Prototype</span>
+          </div>
+          <h3>1. Search by Member</h3>
+          <p>
+            Quickly locate any group member by contact name, role (e.g., Teacher/Student), or phone number using real-time search.
+          </p>
+          <div class="feature-meta">Works with address book contacts &amp; phone numbers</div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon">☰</div>
+            <span class="status-pill status-active">Interactive in Prototype</span>
+          </div>
+          <h3>2. All Messages Mode</h3>
+          <p>
+            View a clean chronological feed containing all text remarks, documents, images, video clips, web links, and voice notes from the selected sender.
+          </p>
+          <div class="feature-meta">Complete conversational context from one person</div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon">📁</div>
+            <span class="status-pill status-active">Interactive in Prototype</span>
+          </div>
+          <h3>3. Documents &amp; Media Mode</h3>
+          <p>
+            Filter strictly for attachments: PDF lecture notes, Word/Excel documents, spreadsheets, worksheets, presentation slides, and shared media.
+          </p>
+          <div class="feature-meta">Excludes casual text messages for focused retrieval</div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon">⇅</div>
+            <span class="status-pill status-active">Interactive in Prototype</span>
+          </div>
+          <h3>4. Sort Newest or Oldest</h3>
+          <p>
+            Toggle sort orders seamlessly. Catch up on the latest announcements first, or reverse to trace an initial course syllabus chronologically.
+          </p>
+          <div class="feature-meta">Instant client-side date reordering</div>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon">📅</div>
+            <span class="status-pill status-concept">Proposed Extension</span>
+          </div>
+          <h3>5. Date Range Filtering</h3>
+          <p>
+            Narrow results by time presets: "All Time", "Last 7 Days", "Last 30 Days", "Last 3 Months", or choose a custom calendar date range.
+          </p>
+          <div class="feature-meta">Illustrated in visual reference panel 7</div>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon">↗</div>
+            <span class="status-pill status-concept">Proposed Extension</span>
+          </div>
+          <h3>6. Open Original Message</h3>
+          <p>
+            Tap any result to jump directly to the message's original location in the group chat, retaining timestamps and surrounding conversation context.
+          </p>
+          <div class="feature-meta">Illustrated with sticky return pill in panel 8</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       5. How It Works Section
+       ========================================================================== -->
+  <section class="section-padding steps-section" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge">User Experience</span>
+        <h2 class="section-title">How It Works in 5 Simple Steps</h2>
+        <p class="section-subtitle">
+          An intuitive flow that feels like a natural part of WhatsApp from the very first tap.
+        </p>
+      </div>
+
+      <div class="steps-container">
+        <!-- Step 1 -->
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h4>Open Group</h4>
+          <p>Open the target group chat and tap the group subject header or the in-chat search icon.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h4>Feature Entry</h4>
+          <p>Tap the new <strong>Messages by Member</strong> option located right inside Group Info.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h4>Select Member</h4>
+          <p>Search by name, role, or phone number and choose the participant whose items you need.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <h4>Choose Filter</h4>
+          <p>Select either <strong>All Messages</strong> or <strong>Documents &amp; Media</strong>, and pick your sort order.</p>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <h4>View Results</h4>
+          <p>Browse the curated stream of messages and tap any item to jump straight into the chat timeline.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       6. Prototype Preview & Visual Reference
+       ========================================================================== -->
+  <section class="section-padding preview-section">
+    <div class="container">
+      <div class="showcase-box">
+        <div class="showcase-header">
+          <span class="badge">Visual Design System</span>
+          <h3>Figma-Style Visual Reference Board</h3>
+          <p>
+            Explore the 9-part visual specification showing mobile screens, date picker modals, return banners, and desktop/web layouts.
+          </p>
+        </div>
+
+        <div class="showcase-media" onclick="openLightbox()" title="Click to open full-resolution wireframe board">
+          <img src="design/visual-reference.png" alt="WhatsApp Messages by Member - Full Wireframe Board">
+          <div class="zoom-hint">🔍 Click to Expand Wireframe Board</div>
+        </div>
+
+        <div class="showcase-cta">
+          <a href="prototype/" class="btn btn-primary">Launch Interactive Prototype ↗</a>
+          <button onclick="openLightbox()" class="btn btn-secondary">Inspect High-Res Wireframe</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       7. Privacy & Security Section
+       ========================================================================== -->
+  <section class="section-padding privacy-section" id="privacy">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge">Security &amp; Architecture</span>
+        <h2 class="section-title">Built with Privacy at the Core</h2>
+        <p class="section-subtitle">
+          Designed to strictly preserve WhatsApp's end-to-end encryption standards and user privacy expectations.
+        </p>
+      </div>
+
+      <div class="privacy-grid">
+        <div class="privacy-card">
+          <div class="privacy-icon">🔒</div>
+          <div class="privacy-text">
+            <h4>End-to-End Encryption Untouched</h4>
+            <p>
+              Filtering executes entirely on the local client device using already decrypted local SQLite records. Server infrastructure never receives search queries or sender filter criteria.
+            </p>
+          </div>
+        </div>
+
+        <div class="privacy-card">
+          <div class="privacy-icon">🛡️</div>
+          <div class="privacy-text">
+            <h4>Strict Group Permission Boundaries</h4>
+            <p>
+              Users can only filter messages within groups of which they are active members. Messages cannot leak across different groups or expose direct private chats.
+            </p>
+          </div>
+        </div>
+
+        <div class="privacy-card">
+          <div class="privacy-icon">⏱️</div>
+          <div class="privacy-text">
+            <h4>Ephemeral &amp; Deleted Message Compliance</h4>
+            <p>
+              Respects "Delete for Everyone" and disappearing message timers immediately. Deleted or expired content is never retained in filtered lists.
+            </p>
+          </div>
+        </div>
+
+        <div class="privacy-card">
+          <div class="privacy-icon">📱</div>
+          <div class="privacy-text">
+            <h4>Synthetic Sample Data</h4>
+            <p>
+              The accompanying prototype runs 100% in your local browser sandbox using fictional sample people and messages. It does not connect to real WhatsApp servers or access live accounts.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       8. Project Documentation Section
+       ========================================================================== -->
+  <section class="section-padding" id="docs">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge">Resources &amp; Downloads</span>
+        <h2 class="section-title">Comprehensive Project Documentation</h2>
+        <p class="section-subtitle">
+          Read the formal proposal submitted to WhatsApp and explore technical specifications.
+        </p>
+      </div>
+
+      <div class="docs-grid">
+        <!-- Doc 1 -->
+        <a href="proposal/Messages_by_Member_Feature_Proposal.pdf" target="_blank" class="doc-card">
+          <span class="doc-badge pdf">PDF Proposal</span>
+          <h4>Feature Proposal</h4>
+          <p>The formal 3-page proposal document detailing problem definition, use cases, and request.</p>
+          <span class="doc-link">View PDF Document ↗</span>
+        </a>
+
+        <!-- Doc 2 -->
+        <a href="docs/project-overview.md" class="doc-card">
+          <span class="doc-badge md">Markdown</span>
+          <h4>Project Overview</h4>
+          <p>Comprehensive background, architectural pillars, target demographics, and tech stack details.</p>
+          <span class="doc-link">Read Overview ↗</span>
+        </a>
+
+        <!-- Doc 3 -->
+        <a href="docs/features.md" class="doc-card">
+          <span class="doc-badge md">Markdown</span>
+          <h4>Feature Specifications</h4>
+          <p>Exhaustive breakdown of entry points, dual filter modes, sorting logic, and WhatsApp Web concept.</p>
+          <span class="doc-link">Read Specs ↗</span>
+        </a>
+
+        <!-- Doc 4 -->
+        <a href="docs/privacy-considerations.md" class="doc-card">
+          <span class="doc-badge md">Markdown</span>
+          <h4>Privacy Analysis</h4>
+          <p>Deep-dive into client-side query indexing, Signal Protocol compatibility, and permission boundaries.</p>
+          <span class="doc-link">Read Privacy Doc ↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       9. Footer
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="brand">
+            <div class="brand-icon">✆</div>
+            <div class="brand-text">
+              Messages by Member
+              <small>WhatsApp Feature Proposal</small>
+            </div>
+          </div>
+          <p>
+            An independent user experience concept designed to bring sender-based precision search to WhatsApp group chats worldwide.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Project Links</h5>
+          <ul>
+            <li><a href="prototype/">Interactive Prototype</a></li>
+            <li><a href="proposal/Messages_by_Member_Feature_Proposal.pdf" target="_blank">PDF Feature Proposal</a></li>
+            <li><a href="design/visual-reference.png" target="_blank">Visual Reference Board</a></li>
+            <li><a href="https://github.com/Dev24100/WhatsApp-Messages-by-Member" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Documentation</h5>
+          <ul>
+            <li><a href="docs/project-overview.md">Project Overview</a></li>
+            <li><a href="docs/features.md">Feature Specs</a></li>
+            <li><a href="docs/privacy-considerations.md">Privacy Considerations</a></li>
+            <li><a href="proposal/submission-message.txt">Submission Message</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-disclaimer">
+        <strong>Disclaimer:</strong> This is an independent feature suggestion and prototype. It is not affiliated with, endorsed by, or officially connected to WhatsApp LLC or Meta Platforms, Inc. WhatsApp and the WhatsApp logo are registered trademarks of Meta Platforms, Inc.
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2026 Messages by Member Feature Concept. Released for independent review.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       Lightbox Modal
+       ========================================================================== -->
+  <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox(event)" aria-label="Close Preview">&times;</button>
+      <img src="design/visual-reference.png" alt="High-Resolution Visual Reference Board" style="width: 100%; display: block;">
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Interactive Logic (Mobile Nav & Lightbox)
+       ========================================================================== -->
+  <script>
+    // Mobile navigation toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        menuToggle.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+      });
+
+      // Close mobile menu on link click
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('active');
+          menuToggle.textContent = '☰';
+        });
+      });
+    }
+
+    // Lightbox modal handlers
+    function openLightbox() {
+      const modal = document.getElementById('lightboxModal');
+      if (modal) modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(e) {
+      if (e.target.classList.contains('lightbox-modal') || e.target.classList.contains('lightbox-close')) {
+        const modal = document.getElementById('lightboxModal');
+        if (modal) modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Keyboard escape key to close lightbox
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('lightboxModal');
+        if (modal && modal.classList.contains('active')) {
+          modal.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+    });
+  </script>
+</body>
+</html>
