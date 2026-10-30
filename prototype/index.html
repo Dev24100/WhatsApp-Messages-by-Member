@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Messages by Member — WhatsApp Feature Prototype</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="top">
+    <div class="logo">
+      <div class="mark">✆</div>
+      <div>
+        Messages by Member
+        <small>Independent WhatsApp feature concept</small>
+      </div>
+    </div>
+    <span class="tag">INTERACTIVE PROTOTYPE · SAMPLE DATA</span>
+  </header>
+
+  <!-- Container -->
+  <div class="wrap">
+    <section class="intro">
+      <div>
+        <h1>Find the message. Find the sender.</h1>
+        <p>A clickable concept showing how a group member could filter a busy WhatsApp group by sender, then view all messages or only documents and media.</p>
+      </div>
+      <span class="tag">UX CONCEPT · 2026</span>
+    </section>
+
+    <!-- Two-column Layout -->
+    <div class="layout">
+      <!-- Sidebar Flow Navigation -->
+      <aside class="panel side">
+        <h3>Prototype flow</h3>
+        <nav class="nav">
+          <button class="active" data-step="0">01 · Group chat</button>
+          <button data-step="1">02 · Feature entry</button>
+          <button data-step="2">03 · Select member</button>
+          <button data-step="3">04 · Choose filter</button>
+          <button data-step="4">05 · Filtered results</button>
+        </nav>
+        <div class="side-note">
+          <b>How to test</b><br>
+          Use the steps above or the Next buttons. Select different members, search by name or phone number, switch between the two filter modes, and change the sort order. All displayed conversations are fictional.
+        </div>
+      </aside>
+
+      <!-- Main Workspace -->
+      <main class="panel workspace">
+        <div class="workspace-head">
+          <div>
+            <h2 id="stepTitle">01 · Group chat</h2>
+            <p id="stepDesc">A busy college group with messages from several teachers.</p>
+          </div>
+          <span class="tag" id="counter">1 / 5</span>
+        </div>
+
+        <div class="content">
+          <!-- Step 01: Group Chat Context -->
+          <section class="step active" data-title="01 · Group chat" data-desc="A busy college group with messages from several teachers.">
+            <div class="phone-area">
+              <div class="phone">
+                <div class="phonebar">
+                  <span>9:41</span>
+                  <span>●●●  Wi-Fi  92%</span>
+                </div>
+                <div class="chathead">
+                  <span class="back">‹</span>
+                  <div class="avatar">IT</div>
+                  <div>
+                    <strong>IT Class — Semester 3</strong>
+                    <small>128 participants</small>
+                  </div>
+                </div>
+                <div class="chatbody">
+                  <div class="bubble">
+                    <div class="who">Prof. Sharma</div>
+                    Here are the DBMS notes for Unit 1.
+                    <div class="doc">
+                      <div class="pdf">PDF</div>
+                      <div>
+                        <b>DBMS_Unit1_Notes.pdf</b><br>
+                        <small>2.4 MB · PDF</small>
+                      </div>
+                    </div>
+                    <span class="time">10:32 AM</span>
+                  </div>
+                  <div class="bubble">
+                    <div class="who" style="color:#2872a5">Prof. Mehta</div>
+                    Please find the C++ assignment details.
+                    <span class="time">11:15 AM</span>
+                  </div>
+                  <div class="bubble">
+                    <div class="who" style="color:#a36b16">Prof. Verma</div>
+                    Important notice for internal examination.
+                    <span class="time">12:05 PM</span>
+                  </div>
+                  <div class="bubble">
+                    <div class="who">Prof. Sharma</div>
+                    Normalization diagram for Unit 1.
+                    <span class="time">2:30 PM</span>
+                  </div>
+                </div>
+                <div class="phonefoot">＋　Message　　　　　　　　　➤</div>
+              </div>
+
+              <div style="max-width:260px;padding:18px">
+                <h3>Problem</h3>
+                <p style="color:var(--muted);line-height:1.6;font-size:12px">
+                  When many teachers or colleagues share material in one group, a member may need to search through messages from everyone to find one person's files.
+                </p>
+                <div class="hint">
+                  Proposed improvement: let users filter the group's existing messages by the person who sent them.
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Step 02: Entry Point in Group Info -->
+          <section class="step" data-title="02 · Feature entry" data-desc="Add a clear entry point inside group information.">
+            <div class="phone-area">
+              <div class="phone">
+                <div class="phonebar">
+                  <span>9:41</span>
+                  <span>●●●  Wi-Fi  92%</span>
+                </div>
+                <div class="chathead">
+                  <span class="back">‹</span>
+                  <div>
+                    <strong>IT Class — Semester 3</strong>
+                    <small>128 participants</small>
+                  </div>
+                </div>
+                <div style="padding:14px">
+                  <div class="member" style="margin:10px 0">
+                    <div class="avatar">☎</div>
+                    <div>
+                      <b>Audio, video and add members</b>
+                      <small>Group actions</small>
+                    </div>
+                  </div>
+                  <div class="member">
+                    <div class="avatar">▧</div>
+                    <div>
+                      <b>Media, links and docs</b>
+                      <small>Existing group content</small>
+                    </div>
+                  </div>
+                  <button class="member selected" style="margin-top:8px" onclick="go(2)">
+                    <div class="avatar">⌕</div>
+                    <div style="flex:1">
+                      <b>Messages by Member</b>
+                      <small>Filter messages by participant</small>
+                    </div>
+                    <span class="tag">NEW</span>
+                  </button>
+                  <div class="member" style="margin-top:8px">
+                    <div class="avatar">☆</div>
+                    <div>
+                      <b>Starred messages</b>
+                      <small>Saved items</small>
+                    </div>
+                  </div>
+                  <div class="hint">Tap the highlighted option to continue.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Step 03: Select Participant (Search by name or number) -->
+          <section class="step" data-title="03 · Select member" data-desc="Search for a participant by saved name or phone number.">
+            <div class="phone-area">
+              <div style="width:min(100%,400px)">
+                <h3 style="margin-top:0">Who sent the message?</h3>
+                <input id="memberSearch" class="search" placeholder="Search member name or phone number…" oninput="renderMembers()">
+                <div id="memberList" class="member-list"></div>
+                <div class="controls">
+                  <button class="btn" onclick="go(3)">Continue with selected member</button>
+                </div>
+                <div class="hint">
+                  Only participants in this group appear in the list. A real implementation should follow the user's existing group access and visibility permissions.
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Step 04: Choose Filter Mode & Sorting -->
+          <section class="step" data-title="04 · Choose filter" data-desc="Choose all messages or just documents and media.">
+            <div style="max-width:620px;margin:auto">
+              <h3 style="margin-top:0">Filter messages from <span id="chosenName" style="color:var(--green)">Prof. Sharma</span></h3>
+              <div class="modes">
+                <button class="mode selected" data-mode="all" onclick="setMode('all')">
+                  <div style="font-size:22px">☰</div>
+                  <strong>All Messages</strong>
+                  <span>Text, documents, images, videos, links and supported message types.</span>
+                </button>
+                <button class="mode" data-mode="files" onclick="setMode('files')">
+                  <div style="font-size:22px">▤</div>
+                  <strong>Documents &amp; Media</strong>
+                  <span>PDFs, office files, images, videos and supported attachments.</span>
+                </button>
+              </div>
+              <div class="controls">
+                <label style="font-size:11px;color:var(--muted)">Sort results</label>
+                <select class="select" id="sort" onchange="renderResults()">
+                  <option value="new">Newest first</option>
+                  <option value="old">Oldest first</option>
+                </select>
+                <button class="btn" onclick="go(4)">View filtered messages</button>
+              </div>
+              <div class="hint">
+                Optional future enhancement: add a date range filter (for example, last 7 days or a custom date range).
+              </div>
+            </div>
+          </section>
+
+          <!-- Step 05: Filtered Results -->
+          <section class="step" data-title="05 · Filtered results" data-desc="See only the selected member's messages and jump to the original group context.">
+            <div style="max-width:720px;margin:auto">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                <div>
+                  <h3 id="resultHeading" style="margin:0">Prof. Sharma · All Messages</h3>
+                  <small style="color:var(--muted)">IT Class — Semester 3</small>
+                </div>
+                <button class="btn secondary" onclick="go(3)">Change filters</button>
+              </div>
+              <div id="results" class="results"></div>
+              <div class="hint">
+                In a real WhatsApp implementation, tapping a result should open the original message in the group, retaining its timestamp and surrounding context.
+              </div>
+            </div>
+          </section>
+
+          <!-- Stepper Footer Buttons -->
+          <div style="display:flex;justify-content:space-between;gap:10px;margin-top:22px;border-top:1px solid var(--line);padding-top:16px">
+            <button class="btn secondary" id="prev" onclick="go(current-1)" disabled>← Back</button>
+            <button class="btn" id="next">Next →</button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Prototype Footer Notice -->
+    <div class="footer">
+      Independent concept prototype. Not affiliated with, endorsed by, or connected to WhatsApp or Meta. Fictional sample data only.
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div class="toast" id="toast"></div>
+
+  <!-- External Script -->
+  <script src="script.js"></script>
+</body>
+</html>

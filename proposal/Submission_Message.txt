@@ -1,0 +1,26 @@
+Subject: Feature suggestion for WhatsApp Groups — “Messages by Member”
+
+Hello WhatsApp Team,
+
+I would like to suggest a feature called “Messages by Member” to make large WhatsApp groups easier to use.
+
+In groups used by colleges, schools, offices and communities, many participants share messages and files. When a user needs content shared by one particular participant, finding it among everyone else’s messages can take time.
+
+The proposed feature would let a user select a group participant and view either:
+1. All messages shared by that participant; or
+2. Only documents and media shared by that participant.
+
+Users could sort results by date and open the original message in the group. The feature should respect existing message visibility, privacy and end-to-end encryption protections.
+
+I have prepared a short feature proposal and an interactive HTML concept prototype using fictional sample data. The prototype demonstrates the proposed user flow and is available here:
+[PASTE YOUR PUBLIC DEMO LINK HERE]
+
+The proposal and source files are available here:
+[PASTE YOUR PUBLIC REPOSITORY LINK HERE]
+
+I hope your team will consider evaluating this idea for a future WhatsApp update.
+
+Thank you for your time and consideration.
+
+Regards,
+[Your name]
